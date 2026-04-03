@@ -1,62 +1,89 @@
 package csd230.controllers;
 
 import csd230.entities.BookEntity;
-import csd230.repositories.BookRepository;
-import org.springframework.http.ResponseEntity;
+import csd230.entities.CartEntity;
+import csd230.repositories.BookEntityRepository;
+import csd230.repositories.CartEntityRepository; // <--- Import this
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-        import java.util.List;
-
-@RestController
-@RequestMapping("/api/books")
-@CrossOrigin(origins = "http://localhost:5173") // Allow Vite React App
+@Controller
+//@RequestMapping("/books")
 public class BookController {
 
-    private final BookRepository bookRepository;
+    @Autowired
+    private BookEntityRepository bookRepository;
 
-    public BookController(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
+    @Autowired
+    private CartEntityRepository cartRepository; // <--- Inject this
 
-    // GET all books
+    @Operation(summary = "Get all books", description = "Returns the HTML view of the book list")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     @GetMapping
-    public List<BookEntity> getAllBooks() {
-        return bookRepository.findAll();
+    public String getAllBooks(Model model) {
+        model.addAttribute("books", bookRepository.findAll());
+        return "bookList";
     }
 
-    // GET single book
     @GetMapping("/{id}")
-    public ResponseEntity<BookEntity> getBookById(@PathVariable Long id) {
-        return bookRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public String getBookById(@PathVariable Long id, Model model) {
+        BookEntity book = bookRepository.findById(id).orElse(null);
+        model.addAttribute("book", book);
+        return "bookDetails";
     }
 
-    // POST create book
-    @PostMapping
-    public BookEntity createBook(@RequestBody BookEntity book) {
-        return bookRepository.save(book);
+    @GetMapping("/add")
+    public String addBookForm(Model model) {
+        model.addAttribute("book", new BookEntity());
+        return "addBook";
     }
 
-    // PUT update book
-    @PutMapping("/{id}")
-    public ResponseEntity<BookEntity> updateBook(@PathVariable Long id, @RequestBody BookEntity bookDetails) {
-        return bookRepository.findById(id).map(book -> {
-            book.setTitle(bookDetails.getTitle());
-            book.setAuthor(bookDetails.getAuthor());
-            book.setPrice(bookDetails.getPrice());
-            book.setCopies(bookDetails.getCopies());
-            return ResponseEntity.ok(bookRepository.save(book));
-        }).orElse(ResponseEntity.notFound().build());
+    @PostMapping("/add")
+    public String addBook(@ModelAttribute BookEntity book) {
+        bookRepository.save(book);
+        return "redirect:/books";
     }
 
-    // DELETE book
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
-        if (bookRepository.existsById(id)) {
-            bookRepository.deleteById(id);
-            return ResponseEntity.ok().build();
+    @GetMapping("/edit/{id}")
+    public String editBookForm(@PathVariable Long id, Model model) {
+        BookEntity book = bookRepository.findById(id).orElse(null);
+        model.addAttribute("book", book);
+        return "editBook";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String editBook(@PathVariable Long id, @ModelAttribute BookEntity updatedBook) {
+        BookEntity existingBook = bookRepository.findById(id).orElse(null);
+        if (existingBook != null) {
+            existingBook.setAuthor(updatedBook.getAuthor());
+            existingBook.setTitle(updatedBook.getTitle());
+            existingBook.setPrice(updatedBook.getPrice());
+            existingBook.setCopies(updatedBook.getCopies());
+            bookRepository.save(existingBook);
         }
-        return ResponseEntity.notFound().build();
+        return "redirect:/books";
+    }
+
+    // --- UPDATED DELETE METHOD ---
+    @GetMapping("/delete/{id}")
+    public String deleteBook(@PathVariable Long id) {
+        BookEntity book = bookRepository.findById(id).orElse(null);
+
+        if (book != null) {
+            // 1. Remove this book from any Carts that contain it
+            // (We must do this because CartEntity owns the relationship)
+            for (CartEntity cart : book.getCarts()) {
+                cart.getProducts().remove(book);
+                cartRepository.save(cart); // Saves the change to the join table
+            }
+
+            // 2. Now it is safe to delete the book
+            bookRepository.deleteById(id);
+        }
+        return "redirect:/books";
     }
 }
