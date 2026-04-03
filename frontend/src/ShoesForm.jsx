@@ -1,24 +1,35 @@
 import { useState } from 'react';
+import api from './api/axiosConfig';
+import { useAuth } from './provider/AuthProvider';
 
 function ShoesForm({ onShoesAdded }) {
+    const { isAdmin } = useAuth(); // Security check
     const [size, setSize] = useState('');
     const [brand, setBrand] = useState('');
     const [price, setPrice] = useState(0);
     const [highTop, setHighTop] = useState(false);
 
-    const handleSubmit = (e) => {
+    // Hard block for non-admins navigating manually via URL
+    if (!isAdmin) {
+        return <h2 style={{ color: "#ff4444", textAlign: "center", marginTop: "2rem" }}>Access Denied: Admins Only</h2>;
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        fetch('/api/shoes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ size, brand, price: parseFloat(price), highTop }),
-        })
-            .then(res => res.json())
-            .then(saved => {
-                alert("Shoes Saved!");
-                onShoesAdded(saved);
-                setSize(''); setBrand(''); setPrice(0); setHighTop(false);
+        try {
+            const res = await api.post('/shoes', {
+                size,
+                brand,
+                price: parseFloat(price),
+                highTop
             });
+            alert("Shoes Saved!");
+            onShoesAdded(res.data);
+            setSize(''); setBrand(''); setPrice(0); setHighTop(false);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to save shoes");
+        }
     };
 
     return (

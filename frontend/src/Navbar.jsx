@@ -1,35 +1,30 @@
 import { Link } from 'react-router';
+import { useAuth } from './provider/AuthProvider';
 
-function Navbar() {
-    const linkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' };
+function Navbar({ cartCount }) {
+    const { isAdmin } = useAuth();
 
     return (
-        <nav style={{
-            padding: '1rem',
-            backgroundColor: '#222',
-            color: 'white',
-            marginBottom: '20px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '15px',
-            borderRadius: '8px',
-            justifyContent: 'center'
-        }}>
-            <Link to="/" style={linkStyle}>🏠 Home</Link>
+        <nav className="navbar">
+            <Link to="/">🏠 Home</Link>
+            <Link to="/inventory">📚 Books</Link>
+            <Link to="/magazines">📰 Magazines</Link>
+            <Link to="/gloves">🥊 Gloves</Link>
+            <Link to="/shoes">👟 Shoes</Link>
+            <Link to="/cart">🛒 Cart ({cartCount})</Link>
 
-            <Link to="/inventory" style={linkStyle}>📚 Books</Link>
-            <Link to="/add" style={linkStyle}>➕ Add Book</Link>
+            {/* ONLY Admins see the Add options */}
+            {isAdmin && (
+                <>
+                    <Link to="/add">➕ Add Book</Link>
+                    <Link to="/add-magazine">➕ Add Magazine</Link>
+                    <Link to="/add-gloves">➕ Add Gloves</Link>
+                    <Link to="/add-shoes">➕ Add Shoes</Link>
+                </>
+            )}
 
-            <Link to="/magazines" style={linkStyle}>📰 Magazines</Link>
-            <Link to="/add-magazine" style={linkStyle}>➕ Add Magazine</Link>
-
-            <Link to="/gloves" style={linkStyle}>🥊 Gloves</Link>
-            <Link to="/add-gloves" style={linkStyle}>➕ Add Gloves</Link>
-
-            <Link to="/shoes" style={linkStyle}>👟 Shoes</Link>
-            <Link to="/add-shoes" style={linkStyle}>➕ Add Shoes</Link>
+            <Link to="/logout" style={{ color: "#ff4444", marginLeft: "auto" }}>🚪 Logout</Link>
         </nav>
     );
 }
-
 export default Navbar;

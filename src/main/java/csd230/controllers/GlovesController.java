@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/gloves")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/rest/gloves") // FIXED: Added /rest
+@CrossOrigin(origins = "*") // FIXED: Allow all origins
 public class GlovesController {
 
     private final GlovesRepository glovesRepository;
@@ -36,7 +36,7 @@ public class GlovesController {
     @PutMapping("/{id}")
     public ResponseEntity<GlovesEntity> updateGloves(@PathVariable Long id, @RequestBody GlovesEntity glovesDetails) {
         return glovesRepository.findById(id).map(gloves -> {
-            gloves.setSize(glovesDetails.getSize()); // Inherited
+            gloves.setSize(glovesDetails.getSize());
             gloves.setBrand(glovesDetails.getBrand());
             gloves.setPrice(glovesDetails.getPrice());
             gloves.setWeightOz(glovesDetails.getWeightOz());

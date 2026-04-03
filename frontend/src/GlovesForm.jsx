@@ -1,24 +1,35 @@
 import { useState } from 'react';
+import api from './api/axiosConfig';
+import { useAuth } from './provider/AuthProvider';
 
 function GlovesForm({ onGlovesAdded }) {
+    const { isAdmin } = useAuth(); // Security check
     const [size, setSize] = useState('');
     const [brand, setBrand] = useState('');
     const [price, setPrice] = useState(0);
     const [weightOz, setWeightOz] = useState(12);
 
-    const handleSubmit = (e) => {
+    // Hard block for non-admins navigating manually via URL
+    if (!isAdmin) {
+        return <h2 style={{ color: "#ff4444", textAlign: "center", marginTop: "2rem" }}>Access Denied: Admins Only</h2>;
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        fetch('/api/gloves', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ size, brand, price: parseFloat(price), weightOz: parseInt(weightOz, 10) }),
-        })
-            .then(res => res.json())
-            .then(saved => {
-                alert("Gloves Saved!");
-                onGlovesAdded(saved);
-                setSize(''); setBrand(''); setPrice(0); setWeightOz(12);
+        try {
+            const res = await api.post('/gloves', {
+                size,
+                brand,
+                price: parseFloat(price),
+                weightOz: parseInt(weightOz, 10)
             });
+            alert("Gloves Saved!");
+            onGlovesAdded(res.data);
+            setSize(''); setBrand(''); setPrice(0); setWeightOz(12);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to save gloves");
+        }
     };
 
     return (
