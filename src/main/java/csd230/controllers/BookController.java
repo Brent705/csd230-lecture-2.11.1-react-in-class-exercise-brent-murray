@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Controller
-//@RequestMapping("/books")
+@RequestMapping("/books")
 public class BookController {
 
     @Autowired
