@@ -35,10 +35,3 @@ WORKDIR /app
 COPY --from=backend-build /app/target/*.jar app.jar
 
 ENTRYPOINT ["java", "-Xmx512m", "-jar", "app.jar"]
-
-deploy:
-  needs: test
-  runs-on: ubuntu-latest
-  steps:
-    - name: Trigger Render
-    run: curl -f "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
