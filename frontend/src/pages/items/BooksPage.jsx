@@ -1,6 +1,6 @@
-import { useBooks } from '../hooks/useBooks';
-import Book from '../components/items/Book';
-import CategoryPage from './CategoryPage';
+import { useBooks } from '../../hooks/useBooks.js';
+import Book from '../../components/items/Book.jsx';
+import CategoryPage from './CategoryPage.jsx';
 import { BookOpen } from 'lucide-react';
 
 export function BooksPage() {
@@ -18,5 +18,5 @@ export function BooksPage() {
         >
             {books?.map(b => <Book key={b.id} {...b} />)}
         </CategoryPage>
-    );
+    ); 
 }

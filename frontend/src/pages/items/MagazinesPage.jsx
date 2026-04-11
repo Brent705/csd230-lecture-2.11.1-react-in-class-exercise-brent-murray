@@ -1,6 +1,6 @@
-import { useMagazines } from '../hooks/useMagazines';
-import Magazine from '../components/items/Magazine';
-import CategoryPage from './CategoryPage';
+import { useMagazines } from '../../hooks/useMagazines.js';
+import Magazine from '../../components/items/Magazine.jsx';
+import CategoryPage from './CategoryPage.jsx';
 import { Newspaper } from 'lucide-react';
 
 export function MagazinesPage() {

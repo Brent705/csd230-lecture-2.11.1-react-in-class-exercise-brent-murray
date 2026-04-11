@@ -1,6 +1,6 @@
-import { useShoes } from '../hooks/useShoes';
-import Shoes from '../components/items/Shoes';
-import CategoryPage from './CategoryPage';
+import { useShoes } from '../../hooks/useShoes.js';
+import Shoes from '../../components/items/Shoes.jsx';
+import CategoryPage from './CategoryPage.jsx';
 import { GiRunningShoe } from 'react-icons/gi';
 
 export function ShoesPage() {

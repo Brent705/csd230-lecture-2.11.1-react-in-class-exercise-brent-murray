@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useAuth } from "../provider/AuthProvider.jsx"; // FIXED
+import { useAuth } from "../../provider/AuthProvider.jsx"; // FIXED
 
 const Logout = () => {
     const { setToken } = useAuth();

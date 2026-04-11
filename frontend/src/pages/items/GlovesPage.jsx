@@ -1,6 +1,6 @@
-import { useGloves } from '../hooks/useGloves';
-import Gloves from '../components/items/Gloves';
-import CategoryPage from './CategoryPage';
+import { useGloves } from '../../hooks/useGloves.js';
+import Gloves from '../../components/items/Gloves.jsx';
+import CategoryPage from './CategoryPage.jsx';
 import { GiBoxingGlove } from 'react-icons/gi';
 
 export function GlovesPage() {

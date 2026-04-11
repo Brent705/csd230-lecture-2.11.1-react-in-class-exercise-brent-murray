@@ -1,4 +1,7 @@
 package csd230.repositories;
+import csd230.entities.HeadgearEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface HeadgearRepository {
-}
+@Repository
+public interface HeadgearRepository extends JpaRepository<HeadgearEntity, Long> {}
